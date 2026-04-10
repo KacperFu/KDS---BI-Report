@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KajoDataSpace — Business Intelligence Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #0C0F14;
+  --surface: #13181F;
+  --surface2: #1A2030;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #C4CAD6;
+  --muted: #7A8499;
+  --faint: #3A4155;
+  --yellow: #F5C842;
+  --yellow2: #E0B028;
+  --yellow-dim: rgba(245,200,66,0.12);
+  --teal: #56B4E9;
+  --teal2: #3A9BD5;
+  --teal-dim: rgba(86,180,233,0.12);
+  --red: #D55E00;
+  --red2: #B54E00;
+  --red-dim: rgba(213,94,0,0.12);
+  --green: #56B4E9;
+  --green-dim: rgba(86,180,233,0.12);
+  --blue: #0072B2;
+  --blue-dim: rgba(0,114,178,0.12);
+}
+[data-theme="light"] {
+  --bg: #F0F2F7;
+  --surface: #FFFFFF;
+  --surface2: #E8EBF2;
+  --border: rgba(0,0,0,0.09);
+  --border2: rgba(0,0,0,0.18);
+  --text: #18202E;
+  --muted: #5A6478;
+  --faint: #9AA0AE;
+  --yellow: #9A6F00;
+  --yellow2: #7A5800;
+  --yellow-dim: rgba(154,111,0,0.10);
+  --teal: #0A7FAF;
+  --teal2: #086A92;
+  --teal-dim: rgba(10,127,175,0.10);
+  --red: #B83A00;
+  --red2: #8F2D00;
+  --red-dim: rgba(184,58,0,0.10);
+  --green: #0A7FAF;
+  --green-dim: rgba(10,127,175,0.10);
+  --blue: #005694;
+  --blue-dim: rgba(0,86,148,0.10);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { transition: background-color 0.3s, color 0.3s; }
+.theme-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 20px; padding: 5px 12px 5px 8px;
+  cursor: pointer; flex-shrink: 0;
+  font-family: 'DM Sans', sans-serif; font-size: 11px;
+  color: var(--muted); transition: all 0.2s;
+}
+.theme-btn:hover { border-color: var(--yellow); color: var(--text); }
+.theme-icon {
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; line-height: 1;
+  background: var(--yellow-dim);
+  transition: background 0.2s;
+}
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ──────────── HEADER ──────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 32px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  position: sticky; top: 0; z-index: 100;
+}
+.header-left { display: flex; align-items: center; gap: 16px; }
+.logo-mark {
+  width: 40px; height: 40px;
+  background: var(--yellow);
+  border-radius: 8px;
+  display: flex; align-items: flex-end;
+  justify-content: center;
+  gap: 3px;
+  padding: 6px 7px 8px;
+  flex-shrink: 0;
+}
+.logo-bar-k { width: 11px; background: var(--teal); border-radius: 2px 2px 0 0; height: 22px; display: flex; align-items: center; justify-content: center; }
+.logo-bar-d { width: 11px; background: var(--red); border-radius: 2px 2px 0 0; height: 17px; display: flex; align-items: center; justify-content: center; }
+.logo-bar-k span, .logo-bar-d span { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 8px; color: white; }
+.kajo-logo-img { height: 44px; width: auto; border-radius: 8px; flex-shrink: 0; }
+.header-brand { display: flex; flex-direction: column; gap: 1px; }
+.brand-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: 0.01em; }
+.brand-sub { font-size: 11px; color: var(--muted); letter-spacing: 0.05em; text-transform: uppercase; }
+.da-logo-wrap {
+  display: flex; align-items: center; gap: 8px;
+  padding-left: 20px;
+  border-left: 1px solid var(--border2);
+  flex-shrink: 0;
+}
+.da-logo-label { font-size: 9px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.10em; white-space: nowrap; }
+.da-logo-img { height: 36px; width: auto; background: #fff; border-radius: 6px; padding: 2px 6px; }
+.header-meta { display: flex; align-items: center; gap: 24px; }
+.header-period { font-size: 11px; color: var(--muted); }
+.header-period strong { color: var(--yellow); font-weight: 500; }
+.status-pill { display: flex; align-items: center; gap: 6px; background: var(--green-dim); border: 1px solid rgba(86,180,233,0.2); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: var(--green); font-weight: 500; }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+
+/* ──────────── LAYOUT ──────────── */
+.page { padding: 24px 32px 40px; max-width: 1400px; margin: 0 auto; }
+.section-title {
+  font-family: 'Syne', sans-serif; font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted);
+  margin: 28px 0 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-title::after { content:''; flex:1; height:1px; background: var(--border); }
+
+/* ──────────── KPI CARDS ──────────── */
+.kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 20px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.kpi-card:hover { border-color: var(--border2); }
+.kpi-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+}
+.kpi-card.y::before { background: var(--yellow); }
+.kpi-card.t::before { background: var(--teal); }
+.kpi-card.r::before { background: var(--red); }
+.kpi-card.g::before { background: var(--green); }
+.kpi-card.b::before { background: var(--blue); }
+.kpi-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.kpi-value { font-family: 'DM Mono', monospace; font-size: 26px; font-weight: 500; color: var(--text); line-height: 1; margin-bottom: 6px; }
+.kpi-value.y { color: var(--yellow); }
+.kpi-value.t { color: var(--teal); }
+.kpi-value.g { color: var(--green); }
+.kpi-delta { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 500; }
+.kpi-delta.up { background: var(--green-dim); color: var(--green); }
+.kpi-delta.down { background: var(--red-dim); color: var(--red); }
+.kpi-delta.neu { background: var(--yellow-dim); color: var(--yellow); }
+
+/* ──────────── CHARTS ROW ──────────── */
+.chart-grid-2 { display: grid; grid-template-columns: minmax(0,1.65fr) minmax(0,1fr); gap: 16px; align-items: stretch; }
+.chart-grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; align-items: start; }
+.chart-grid-22 { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 16px; align-items: stretch; }
+.card-fill { display: flex; flex-direction: column; }
+.card-fill .chart-wrap { flex: 1; min-height: 0; height: auto !important; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 22px;
+}
+.card-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+.card-sub { font-size: 11px; color: var(--muted); margin-bottom: 16px; }
+.chart-wrap { position: relative; width: 100%; }
+
+/* ──────────── LEGEND ──────────── */
+.legend { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
+.leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--muted); }
+.leg-sq { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+.leg-line { width: 16px; height: 2px; flex-shrink: 0; }
+.leg-dash { width: 16px; height: 2px; flex-shrink: 0; background: repeating-linear-gradient(90deg, currentColor 0, currentColor 4px, transparent 4px, transparent 7px); }
+
+/* ──────────── RETENTION TABLE ──────────── */
+.ret-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.ret-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 500; padding: 0 8px 10px; text-align: center; }
+.ret-table th:first-child { text-align: left; }
+.ret-table td { padding: 5px 8px; text-align: center; font-family: 'DM Mono', monospace; font-size: 12px; border-radius: 4px; }
+.ret-table td:first-child { text-align: left; font-family: 'DM Sans', sans-serif; color: var(--muted); font-size: 11px; }
+.ret-table tr:not(:last-child) td { border-bottom: 1px solid var(--border); }
+
+/* ──────────── PREDICTION PANEL ──────────── */
+.pred-accent { border: 1px solid rgba(245,200,66,0.2); background: var(--surface); }
+.forecast-bar { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); }
+.forecast-bar:last-child { border-bottom: none; }
+.fc-month { font-size: 11px; color: var(--muted); min-width: 52px; }
+.fc-bar-wrap { flex: 1; background: var(--surface2); border-radius: 3px; height: 7px; overflow: hidden; }
+.fc-bar-fill { height: 100%; border-radius: 3px; }
+.fc-val { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--yellow); min-width: 70px; text-align: right; }
+.fc-ci { font-size: 10px; color: var(--muted); min-width: 80px; text-align: right; }
+
+/* ──────────── INSIGHT PILLS ──────────── */
+.insight-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.insight { display: flex; align-items: flex-start; gap: 8px; padding: 10px 14px; border-radius: 8px; font-size: 12px; line-height: 1.5; }
+.insight.warn { background: var(--red-dim); border: 1px solid rgba(184,58,0,0.2); color: var(--red); }
+.insight.good { background: var(--green-dim); border: 1px solid rgba(10,127,175,0.2); color: var(--teal); }
+.insight.info { background: var(--yellow-dim); border: 1px solid rgba(154,111,0,0.2); color: var(--yellow); }
+.insight-icon { font-size: 14px; line-height: 1; flex-shrink: 0; margin-top: 1px; }
+.insight strong { font-weight: 500; display: block; margin-bottom: 2px; }
+.seg-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.seg-card { border-radius: 10px; padding: 14px 16px; border: 1px solid; }
+.seg-card.p { background: rgba(86,180,233,0.07); border-color: rgba(86,180,233,0.2); }
+.seg-card.s { background: rgba(0,114,178,0.07); border-color: rgba(0,114,178,0.2); }
+.seg-card.pr { background: rgba(213,94,0,0.07); border-color: rgba(213,94,0,0.2); }
+.seg-head { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; margin-bottom: 10px; }
+.seg-head.p { color: var(--teal); }
+.seg-head.s { color: var(--blue); }
+.seg-head.pr { color: var(--red); }
+.seg-stat { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px; font-size: 11px; padding: 4px 0; border-bottom: 1px solid var(--border); }
+.seg-stat:last-child { border-bottom: none; }
+.seg-stat-k { color: var(--muted); white-space: nowrap; }
+.seg-stat-v { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--text); text-align: right; }
+
+/* ──────────── FOOTER ──────────── */
+.footer { display: flex; align-items: center; justify-content: space-between; padding: 16px 32px; border-top: 1px solid var(--border); background: var(--surface); margin-top: 12px; }
+.footer-note { font-size: 11px; color: var(--muted); }
+.footer-brand { font-family: 'Syne', sans-serif; font-size: 12px; color: var(--faint); font-weight: 600; }
+
+/* ──────────── ANIMATIONS ──────────── */
+.card, .kpi-card { }
+@keyframes fadeUp { from { opacity: 1; } to { opacity: 1; } }
+
+
+  /* ── NAV BAR ── */
+  .nav-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; height: 48px;
+    background: var(--bg); border-bottom: 1px solid var(--border);
+    position: sticky; top: 61px; z-index: 90;
+  }
+  .nav-pages { display: flex; gap: 4px; }
+  .nav-btn {
+    display: flex; align-items: center; gap: 7px;
+    padding: 6px 16px; border-radius: 6px;
+    background: transparent; border: 1px solid transparent;
+    font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 400;
+    color: var(--muted); cursor: pointer; transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .nav-btn:hover { background: var(--surface2); color: var(--text); }
+  .nav-btn.active {
+    background: var(--surface2); border-color: var(--border2);
+    color: var(--text); font-weight: 500;
+  }
+  .nav-icon { font-size: 11px; opacity: 0.7; }
+
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <img src="kajo-logo.png" class="kajo-logo-img" alt="KajoDataSpace">
+    <div class="header-brand">
+      <div class="brand-name">KajoDataSpace</div>
+      <div class="brand-sub">Business Intelligence Report</div>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div class="header-period">Okres: <strong>Lis 2023 – Mar 2026</strong> &nbsp;·&nbsp; Ostatnia aktualizacja: <strong>31 Mar 2026</strong></div>
+    <div class="status-pill"><span class="status-dot"></span> Live data</div>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Toggle theme">
+      <span class="theme-icon" id="themeIcon">☀️</span>
+      <span id="themeLabel">Light</span>
+    </button>
+    <div class="da-logo-wrap">
+      <span class="da-logo-label">Presented by</span>
+      <img src="da-logo.png" class="da-logo-img" alt="Data Acolyte">
+    </div>
+  </div>
+</div>
+
+
+<!-- NAV -->
+<div class="nav-bar" id="navBar">
+  <div class="nav-pages">
+    <button class="nav-btn active" onclick="showPage(0)" id="navBtn0">
+      <span class="nav-icon">◫</span>Dashboard
+    </button>
+    <button class="nav-btn" onclick="showPage(1)" id="navBtn1">
+      <span class="nav-icon">◈</span>Wnioski & Rekomendacje
+    </button>
+    <button class="nav-btn" onclick="showPage(2)" id="navBtn2">
+      <span class="nav-icon">◎</span>Metodologia
+    </button>
+  </div>
+  <div style="font-size:11px; color:var(--muted);" id="navPageLabel">Strona 1 z 3</div>
+</div>
+
+<div class="page-view" id="page0">
+<!-- PAGE -->
+<div class="page">
+
+  <!-- KPI ROW -->
+  <div class="section-title">Kluczowe wskaźniki</div>
+  <div class="kpi-grid">
+    <div class="kpi-card y">
+      <div class="kpi-label">Przychód Mar 2026</div>
+      <div class="kpi-value y">79 971</div>
+      <div style="font-size:10px; color:var(--muted); margin-bottom:6px;">PLN</div>
+      <span class="kpi-delta up">▲ +50% MoM</span>
+    </div>
+    <div class="kpi-card t">
+      <div class="kpi-label">Aktywni klienci</div>
+      <div class="kpi-value t">228</div>
+      <div style="font-size:10px; color:var(--muted); margin-bottom:6px;">Mar 2026</div>
+      <span class="kpi-delta up">▲ +11% YoY</span>
+    </div>
+    <div class="kpi-card g">
+      <div class="kpi-label">Nowi klienci (Mar)</div>
+      <div class="kpi-value g">47</div>
+      <div style="font-size:10px; color:var(--muted); margin-bottom:6px;">w miesiącu</div>
+      <span class="kpi-delta up">▲ +81% MoM</span>
+    </div>
+    <div class="kpi-card b">
+      <div class="kpi-label">Łączna baza</div>
+      <div class="kpi-value" style="color:var(--blue);">1 057</div>
+      <div style="font-size:10px; color:var(--muted); margin-bottom:6px;">unikalni klienci</div>
+      <span class="kpi-delta neu">313 płaci z góry · 60 free months</span>
+    </div>
+    <div class="kpi-card r">
+      <div class="kpi-label">LTV · Standard 169</div>
+      <div class="kpi-value" style="color:var(--red);">1 026 zł</div>
+      <div style="font-size:10px; color:var(--muted); margin-bottom:6px;">avg · najzdrowszy plan</div>
+      <span class="kpi-delta neu">Plan mies. 199: 816 zł</span>
+    </div>
+    <div class="kpi-card y" style="border:1px solid rgba(196,149,0,0.35);">
+      <div class="kpi-label">Locked price Q1 2026</div>
+      <div class="kpi-value y">190</div>
+      <div style="font-size:10px; color:var(--muted); margin-bottom:6px;">klientów poniżej 249 zł (67,4%)</div>
+      <span class="kpi-delta up" style="background:rgba(196,149,0,0.15); color:var(--yellow);">+13 478 zł/mies. potencjał</span>
+    </div>
+    <div class="kpi-card t" style="border:1px solid rgba(86,180,233,0.35);">
+      <div class="kpi-label">Klienci promo (15%)</div>
+      <div class="kpi-value t">159</div>
+      <div style="font-size:10px; color:var(--muted); margin-bottom:6px;">dołączyło z kodem zniżkowym</div>
+      <span class="kpi-delta down">M+1: 60,4% vs 68,3% baza</span>
+    </div>
+    <div class="kpi-card" style="border:1px solid rgba(0,114,178,0.35);">
+      <div class="kpi-label">Płatności z góry</div>
+      <div class="kpi-value" style="color:var(--blue);">313</div>
+      <div style="font-size:10px; color:var(--muted); margin-bottom:6px;">29,6% bazy · 6 lub 12 mies.</div>
+      <span class="kpi-delta neu">avg 1 096–1 279 zł</span>
+    </div>
+  </div>
+
+  <!-- ROW 1: Revenue + Retention -->
+  <div class="section-title">Przychód i aktywność</div>
+  <div class="chart-grid-2">
+    <div class="card card-fill">
+      <div class="card-title">Miesięczny przychód i aktywni klienci</div>
+      <div class="card-sub">Wszystkie transakcje · podwyżki zaznaczone pionową linią</div>
+      <div class="legend">
+        <span class="leg-item"><span class="leg-sq" style="background:var(--yellow);"></span>Przychód (PLN)</span>
+        <span class="leg-item"><span class="leg-line" style="background:var(--teal);"></span>Aktywni klienci</span>
+      </div>
+      <div class="chart-wrap" style="height:240px;">
+        <canvas id="revChart" role="img" aria-label="Miesięczny przychód KDS od Nov 2023 do Mar 2026">Dane miesięczne.</canvas>
+      </div>
+    </div>
+    <div class="card card-fill">
+      <div class="card-title">Nowi klienci — promo vs cena bazowa</div>
+      <div class="card-sub">Akwizycja miesięczna · kod zniżkowy = zniżka przy dołączeniu</div>
+      <div class="legend">
+        <span class="leg-item"><span class="leg-sq" style="background:var(--teal);"></span>Cena bazowa</span>
+        <span class="leg-item"><span class="leg-sq" style="background:var(--yellow);"></span>Kod zniżkowy</span>
+      </div>
+      <div class="chart-wrap" style="height:240px;">
+        <canvas id="ncChart" role="img" aria-label="Nowi klienci wg typu ceny">Dane akwizycji.</canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 2: Retention analysis -->
+  <div class="section-title">Analiza retencji</div>
+  <div class="chart-grid-2">
+    <div class="card card-fill">
+      <div class="card-title">Krzywe retencji — cennik 2024 i kody zniżkowe</div>
+      <div class="card-sub">% kohorty aktywnej po N miesiącach · ⚠ cennik 2025: dane do M+6 (wrz 2025 – mar 2026)</div>
+      <div class="legend">
+        <span class="leg-item"><span style="width:16px; height:2px; background:#0E8EC4; display:inline-block; border-radius:1px;"></span>Plan mies. 169 zł, cennik 2024 (N=100)</span>
+        <span class="leg-item"><span style="width:16px; height:2px; background:var(--blue); display:inline-block; border-radius:1px;"></span>Plan mies. 199 zł, cennik 2024 (N=201)</span>
+        <span class="leg-item"><span style="width:16px; height:2px; background:var(--yellow); display:inline-block; border-radius:1px;"></span>Promo kod (N=160)</span>
+      </div>
+      <div class="chart-wrap" style="height:230px;">
+        <canvas id="retChart" role="img" aria-label="Krzywe retencji wg segmentu cenowego">Retencja cohortowa.</canvas>
+      </div>
+    </div>
+    <div class="card card-fill">
+      <div class="card-title">Segmenty cenowe — profil retencji</div>
+      <div class="card-sub">Porównanie M+1, lifetime i LTV według segmentu</div>
+      <div class="seg-row" style="margin-bottom:16px;">
+        <div class="seg-card p">
+          <div class="seg-head p">Plan 169 zł</div>
+          <div class="seg-stat"><span class="seg-stat-k">Zniżka</span><span class="seg-stat-v" style="color:var(--teal);">−15%</span></div>
+          <div class="seg-stat"><span class="seg-stat-k">M+1</span><span class="seg-stat-v" style="color:var(--teal);">82,0%</span></div>
+          <div class="seg-stat"><span class="seg-stat-k">M+6</span><span class="seg-stat-v">42,0%</span></div>
+          <div class="seg-stat"><span class="seg-stat-k">LTV</span><span class="seg-stat-v">1 160 zł</span></div>
+          <div class="seg-stat"><span class="seg-stat-k">Klientów</span><span class="seg-stat-v">100</span></div>
+        </div>
+        <div class="seg-card s">
+          <div class="seg-head s">Plan 199 zł</div>
+          <div class="seg-stat"><span class="seg-stat-k">Zniżka</span><span class="seg-stat-v" style="color:var(--blue);">brak</span></div>
+          <div class="seg-stat"><span class="seg-stat-k">M+1</span><span class="seg-stat-v" style="color:var(--blue);">68,4%</span></div>
+          <div class="seg-stat"><span class="seg-stat-k">M+6</span><span class="seg-stat-v">20,4%</span></div>
+          <div class="seg-stat"><span class="seg-stat-k">LTV</span><span class="seg-stat-v">840 zł</span></div>
+          <div class="seg-stat"><span class="seg-stat-k">Klientów</span><span class="seg-stat-v">275</span></div>
+        </div>
+        <div class="seg-card pr">
+          <div class="seg-head pr">Promo kod</div>
+          <div class="seg-stat"><span class="seg-stat-k">Zniżka</span><span class="seg-stat-v" style="color:var(--red);">do −44%</span></div>
+          <div class="seg-stat"><span class="seg-stat-k">M+1</span><span class="seg-stat-v" style="color:var(--red);">60,0%</span></div>
+          <div class="seg-stat"><span class="seg-stat-k">M+6</span><span class="seg-stat-v">23,8%</span></div>
+          <div class="seg-stat"><span class="seg-stat-k">LTV</span><span class="seg-stat-v">714 zł</span></div>
+          <div class="seg-stat"><span class="seg-stat-k">Klientów</span><span class="seg-stat-v">160</span></div>
+        </div>
+      </div>
+      <div style="font-size:10px; color:var(--muted); margin-bottom:12px;">Cennik 2024 (wrz 2024): plan mies. 199 zł, promo launch 169 zł (−15%) · Free months: 60 klientów, łącznie 198 miesięcy · ⚠ Lifetime pominięty: zaburzone przez right-censoring</div>
+      <div class="card-sub" style="margin-bottom:10px;">Najważniejszy wniosek</div>
+      <div style="background:var(--yellow-dim); border:1px solid rgba(196,149,0,0.28); border-radius:10px; padding:14px 16px; margin-bottom:10px;">
+        <div style="font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--yellow); margin-bottom:8px; line-height:1.4;">Główny problem to M+1 churn — nie cena</div>
+        <div style="font-size:12px; color:var(--muted); line-height:1.7;">Podwyżki ceny katalogowej <strong style="color:var(--text);">nie dotykają istniejących klientów</strong> — ich cena jest zablokowana. Nikt nie odszedł z powodu podwyżki i nie wrócił po nowej cenie. Realny problem to fakt, że <strong style="color:var(--text);">co trzeci nowy klient odpada już w pierwszym miesiącu</strong>. Rozwiązanie tego jednego problemu ma większy potencjał wzrostu niż jakakolwiek zmiana cennika.</div>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <div style="display:flex; gap:8px; align-items:flex-start; font-size:11px; line-height:1.55;">
+          <span style="color:var(--teal); flex-shrink:0; font-weight:600; margin-top:1px;">◈</span>
+          <span style="color:var(--muted);"><strong style="color:var(--text);">Lock-in chroni bazę.</strong> 93,4% klientów ma jedną, niezmienną cenę przez całe życie subskrypcji. Podwyżki dotyczą wyłącznie nowych klientów.</span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:flex-start; font-size:11px; line-height:1.55;">
+          <span style="color:var(--blue); flex-shrink:0; font-weight:600; margin-top:1px;">◈</span>
+          <span style="color:var(--muted);"><strong style="color:var(--text);">28 dobrowolnych upgradów</strong> (2,6% bazy) — klienci sami przeszli na droższy plan, najczęściej 169→199 i 199→249 zł po przerwie.</span>
+        </div>
+        <div style="display:flex; gap:8px; align-items:flex-start; font-size:11px; line-height:1.55;">
+          <span style="color:var(--red); flex-shrink:0; font-weight:600; margin-top:1px;">◈</span>
+          <span style="color:var(--muted);"><strong style="color:var(--text);">Promo nie pomaga retencji</strong> — M+1=60,4% vs 68,3% dla ceny bazowej. Kody zniżkowe przyciągają, ale nie zatrzymują.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 3: PREDICTIVE -->
+  <div class="section-title">Analiza predykcyjna — Q2/Q3 2026</div>
+  <div class="chart-grid-2">
+    <div class="card pred-accent card-fill">
+      <div class="card-title">Prognoza przychodu · Kwi–Wrz 2026</div>
+      <div class="card-sub">Regresja liniowa na ostatnich 12 mies. · przedział ufności 80%</div>
+      <div class="chart-wrap" style="height:300px;">
+        <canvas id="forecastChart" role="img" aria-label="Prognoza przychodu KDS na kolejne 6 miesięcy">Prognoza.</canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Prognozowane metryki Kwi–Wrz 2026</div>
+      <div class="card-sub">Trend liniowy · R²=0.11 (wysoka zmienność sezonowa)</div>
+      <div style="margin-bottom: 14px;">
+        <div style="font-size:11px; color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.05em;">Prognoza przychodu (PLN)</div>
+        <div class="forecast-bar">
+          <span class="fc-month">Kwi '26</span>
+          <div class="fc-bar-wrap"><div class="fc-bar-fill" style="width:67%; background:var(--yellow); opacity:0.7;"></div></div>
+          <span class="fc-val">67 269</span>
+          <span class="fc-ci">±18 400</span>
+        </div>
+        <div class="forecast-bar">
+          <span class="fc-month">Maj '26</span>
+          <div class="fc-bar-wrap"><div class="fc-bar-fill" style="width:69%; background:var(--yellow); opacity:0.75;"></div></div>
+          <span class="fc-val">69 013</span>
+          <span class="fc-ci">±19 200</span>
+        </div>
+        <div class="forecast-bar">
+          <span class="fc-month">Cze '26</span>
+          <div class="fc-bar-wrap"><div class="fc-bar-fill" style="width:71%; background:var(--yellow); opacity:0.8;"></div></div>
+          <span class="fc-val">70 757</span>
+          <span class="fc-ci">±20 100</span>
+        </div>
+        <div class="forecast-bar">
+          <span class="fc-month">Lip '26</span>
+          <div class="fc-bar-wrap"><div class="fc-bar-fill" style="width:73%; background:var(--yellow); opacity:0.85;"></div></div>
+          <span class="fc-val">72 500</span>
+          <span class="fc-ci">±21 300</span>
+        </div>
+        <div class="forecast-bar">
+          <span class="fc-month">Sie '26</span>
+          <div class="fc-bar-wrap"><div class="fc-bar-fill" style="width:74%; background:var(--yellow); opacity:0.9;"></div></div>
+          <span class="fc-val">74 244</span>
+          <span class="fc-ci">±22 500</span>
+        </div>
+        <div class="forecast-bar">
+          <span class="fc-month">Wrz '26</span>
+          <div class="fc-bar-wrap"><div class="fc-bar-fill" style="width:76%; background:var(--yellow);"></div></div>
+          <span class="fc-val">75 987</span>
+          <span class="fc-ci">±23 800</span>
+        </div>
+      </div>
+      <div style="background:var(--surface2); border-radius:8px; padding:10px 14px; font-size:11px;">
+        <div style="color:var(--muted); margin-bottom:8px; text-transform:uppercase; letter-spacing:0.05em; font-size:10px;">Prognozowane nowe akwizycje / mies.</div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <div style="background:var(--teal-dim); border:1px solid rgba(14,142,196,0.2); border-radius:6px; padding:6px 10px; text-align:center;">
+            <div style="font-family:'DM Mono',monospace; font-size:15px; color:var(--teal);">50–57</div>
+            <div style="font-size:10px; color:var(--muted);">nowych/mies.</div>
+          </div>
+          <div style="background:var(--blue-dim); border:1px solid rgba(0,95,163,0.2); border-radius:6px; padding:6px 10px; text-align:center;">
+            <div style="font-family:'DM Mono',monospace; font-size:15px; color:var(--blue);">~220</div>
+            <div style="font-size:10px; color:var(--muted);">aktywnych/mies.</div>
+          </div>
+          <div style="background:var(--yellow-dim); border:1px solid rgba(196,149,0,0.2); border-radius:6px; padding:6px 10px; text-align:center;">
+            <div style="font-family:'DM Mono',monospace; font-size:15px; color:var(--yellow);">~430k</div>
+            <div style="font-size:10px; color:var(--muted);">Q2+Q3 przychód</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROW 4: Churn risk + insights -->
+  <div class="chart-grid-22" style="margin-top:16px;">
+    <div class="card card-fill">
+      <div class="card-title">Ryzyko churnu — model oparty o krzywe retencji</div>
+      <div class="card-sub">Szacowane % aktywnej bazy w ryzyku odejścia w ciągu 30/60/90 dni</div>
+      <div class="chart-wrap" style="height:240px;">
+        <canvas id="churnChart" role="img" aria-label="Prognoza ryzyka churnu wg segmentu">Churn risk.</canvas>
+      </div>
+    </div>
+    <div class="card card-fill">
+      <div class="card-title">Kluczowe wnioski i rekomendacje</div>
+      <div class="card-sub">Synteza analizy · priorytet działań</div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div class="insight good">
+          <span class="insight-icon">↑</span>
+          <div><strong>Niższa cena wejścia nie skraca lifetime</strong>Klienci z rabatem przy dołączeniu mają zbliżoną retencję i lifetime do planu Standard 169 zł. Discount onboarding to narzędzie jakościowej akwizycji.</div>
+        </div>
+        <div class="insight warn">
+          <span class="insight-icon">!</span>
+          <div><strong>Plan mies. 249 zł — wysoki churn, dane wstępne</strong>Plan dostępny od Wrz 2025 ma M+1=53,4% — o 24 pp. gorzej niż Standard 169.</div>
+        </div>
+        <div class="insight info">
+          <span class="insight-icon">→</span>
+          <div><strong>Plan mies. 249 zł zastępuje 199 zł jako nowy standard</strong>Od Paź 2025 nowi klienci trafiają głównie na plan miesięczny 249 zł. Retencja wymaga monitorowania przez kolejne 2–3 kwartały zanim wyciągniemy pewne wnioski.</div>
+        </div>
+        <div class="insight good">
+          <span class="insight-icon">↑</span>
+          <div><strong>Wrz jako cykliczny peak akwizycji</strong>Wrz 2024 (+81 nowych) i Wrz 2025 (+53) to najsilniejsze miesiące. Zaplanuj kampanie na Q3 2026.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="page-view" id="page1" style="display:none;">
+<!-- ══════════════════════════════════════════════════════════════ -->
+<!-- PAGE 2 — WNIOSKI I REKOMENDACJE                               -->
+<!-- ══════════════════════════════════════════════════════════════ -->
+<div style="border-top: 2px solid var(--yellow); margin-top: 32px;"></div>
+
+<div class="page" style="padding-top: 28px;">
+
+  <!-- PAGE HEADER -->
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 28px;">
+    <div>
+      <div style="font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--text); margin-bottom:4px;">Wnioski &amp; Rekomendacje</div>
+      <div style="font-size:12px; color:var(--muted);">Synteza 28 miesięcy działalności · KajoDataSpace · Lis 2023 – Mar 2026</div>
+    </div>
+    <div style="display:flex; align-items:center; gap:6px; background:var(--yellow-dim); border:1px solid rgba(196,149,0,0.25); border-radius:8px; padding:8px 16px;">
+      <span style="font-size:11px; font-weight:500; color:var(--yellow); text-transform:uppercase; letter-spacing:0.08em;">Raport Strategiczny</span>
+    </div>
+  </div>
+
+  <!-- NARRATIVE TIMELINE -->
+  <div class="section-title">Co się działo — historia biznesowa</div>
+  <div style="display:grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap:12px; margin-bottom:24px;">
+
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px; border-top:3px solid #6BAF2A; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:#5A9520; text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Faza 1 · Lis 2023 – Sie 2024</div>
+      <div style="font-size:13px; font-weight:500; color:var(--text); margin-bottom:8px;">Launch &amp; Early Growth</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.65;">
+        KDS startuje z ceną <strong style="color:var(--text);">69 zł/mies.</strong> Duża fala zakupów w Lis 2023 (83 aktywnych), potem naturalny spadek. Cena rośnie do <strong style="color:var(--text);">89→99 zł</strong>. Baza stabilizuje się na ~60 klientach. W maju 2024 spike do 115 aktywnych — prawdopodobnie promo lub kampania. Łączny przychód fazy: <strong style="color:var(--text);">~113k zł</strong>.
+      </div>
+    </div>
+
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px; border-top:3px solid var(--yellow); box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:var(--yellow); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Faza 2 · Wrz 2024 – Lip 2025</div>
+      <div style="font-size:13px; font-weight:500; color:var(--text); margin-bottom:8px;">Przełom cenowy</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.65;">
+        Podwyżka do <strong style="color:var(--text);">169 zł</strong> (+71%) zbiega się z największą falą akwizycji — <strong style="color:var(--text);">81 nowych klientów</strong> we wrześniu 2024. Baza skacze z 59 do 152 aktywnych w jeden miesiąc. Nowi klienci płacą 169 zł, starzy zachowują zablokowane ceny. Miesięczny przychód przekracza 40k zł regularnie. Faza <strong style="color:var(--text);">przełomowa</strong> dla rentowności.
+      </div>
+    </div>
+
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px; border-top:3px solid var(--teal); box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:var(--teal); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Faza 3 · Sie 2025 – Mar 2026</div>
+      <div style="font-size:13px; font-weight:500; color:var(--text); margin-bottom:8px;">Skalowanie</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.65;">
+        Druga podwyżka do <strong style="color:var(--text);">199 zł</strong> (+18%) dla nowych. 171 klientów na starych cenach nie odczuwa zmiany — lock-in działa. We Wrz 2025 kolejny rekord akwizycji (+53 nowych). Przychód regularnie <strong style="color:var(--text);">powyżej 60k zł/mies.</strong>, rekord we werzśniu 2025: <strong style="color:var(--text);">77,7k zł</strong>. Reokrd liczby użytkowników w listopadzie 2025 (239).
+      </div>
+    </div>
+
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px; border-top:3px solid var(--blue); box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:var(--blue); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px;">Faza 4 · Od Kwi 2026</div>
+      <div style="font-size:13px; font-weight:500; color:var(--text); margin-bottom:8px;">Nowa era — 249 zł?</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.65;">
+        Pierwsze transakcje po <strong style="color:var(--text);">249 zł</strong> pojawiają się w marcu 2026. Prognoza liniowa wskazuje przychód <strong style="color:var(--text);">67–76k zł/mies.</strong> w Q2/Q3 2026, przy utrzymaniu aktualnego tempa akwizycji <strong style="color:var(--text);">~50 nowych/mies.</strong> Kluczowe pytanie: jak wysoce lojalny jest obecny core?
+      </div>
+    </div>
+  </div>
+
+  <!-- KEY FINDINGS -->
+  <div class="section-title">Kluczowe odkrycia analityczne</div>
+  <div style="display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:12px; margin-bottom:24px;">
+
+    <div style="background:var(--surface); border:1px solid rgba(14,142,196,0.28); border-radius:12px; padding:20px 22px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:12px;">
+        <div style="width:32px; height:32px; background:var(--teal-dim); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; margin-top:2px;">◈</div>
+        <div>
+          <div style="font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--teal); margin-bottom:6px;">Launch promo −15% = najlepszy segment</div>
+          <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(14,142,196,0.08); border:1px solid rgba(14,142,196,0.22); border-radius:4px; padding:3px 9px;">
+            <span style="font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em;">Typ klienta</span>
+            <span style="width:1px; height:10px; background:rgba(14,142,196,0.35);"></span>
+            <span style="font-size:10px; color:var(--teal); font-weight:500; white-space:nowrap;">Lojalny early adopter</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.7; margin-bottom:12px;">
+        Wzorzec potwierdza się w obu erach: <strong style="color:var(--text);">launch promo zawsze bije pełną cenę.</strong> Cennik 2024: plan mies. 169 zł (−15%) → M+1=82%, LTV=1 160 zł vs plan 199 zł → M+1=63,7%, LTV=891 zł. Cennik 2025 (dane wstępne): plan 199 zł (−20%) → M+1=81,1% vs plan 249 zł → M+1=70,7%. Mechanizm: klienci z launch promo wchodzą z poczuciem uzyskanej wartości i locked-in price — co obniża motywację do rezygnacji.
+      </div>
+      <div style="background:var(--surface2); border-radius:8px; padding:10px 12px; font-size:11px; color:var(--muted);">
+        <span style="color:var(--teal); font-weight:500;">Implikacja:</span> Promo to narzędzie jakościowej akwizycji, nie wyprzedaży.
+      </div>
+    </div>
+
+    <div style="background:var(--surface); border:1px solid rgba(14,142,196,0.28); border-radius:12px; padding:20px 22px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:12px;">
+        <div style="width:32px; height:32px; background:var(--green-dim); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; margin-top:2px;">◈</div>
+        <div>
+          <div style="font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--green); margin-bottom:6px;">Standard = fundament wartości</div>
+          <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(14,142,196,0.08); border:1px solid rgba(14,142,196,0.22); border-radius:4px; padding:3px 9px;">
+            <span style="font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em;">Typ klienta</span>
+            <span style="width:1px; height:10px; background:rgba(14,142,196,0.35);"></span>
+            <span style="font-size:10px; color:var(--green); font-weight:500; white-space:nowrap;">Świadomy subskrybent</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.7; margin-bottom:12px;">
+        Klienci płacący 199 zł (N=275, bez zniżki) mają M+1=68,4% i LTV avg=840 zł. To solidny segment, ale wyraźnie poniżej launch promo 169 zł. Klienci na planie miesięcznym 249 zł (N=122) są zbyt świeżym segmentem (maks. 6 mies. danych) by wyciągać pewne wnioski.
+      </div>
+      <div style="background:var(--surface2); border-radius:8px; padding:10px 12px; font-size:11px; color:var(--muted);">
+        <span style="color:var(--green); font-weight:500;">Implikacja:</span> Plan Standard 169 zł to historycznie najzdrowszy segment — rozważ reaktywację jako plan wejściowy.
+      </div>
+    </div>
+
+    <div style="background:var(--surface); border:1px solid rgba(201,64,0,0.28); border-radius:12px; padding:20px 22px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="display:flex; align-items:flex-start; gap:10px; margin-bottom:12px;">
+        <div style="width:32px; height:32px; background:var(--red-dim); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; margin-top:2px;">◉</div>
+        <div>
+          <div style="font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--red); margin-bottom:6px;">Plan mies. 249 zł ma najwyższy churn</div>
+          <div style="display:inline-flex; align-items:center; gap:6px; background:rgba(201,64,0,0.08); border:1px solid rgba(201,64,0,0.22); border-radius:4px; padding:3px 9px;">
+            <span style="font-size:9px; color:var(--muted); text-transform:uppercase; letter-spacing:0.07em;">Typ klienta</span>
+            <span style="width:1px; height:10px; background:rgba(201,64,0,0.35);"></span>
+            <span style="font-size:10px; color:var(--red); font-weight:500; white-space:nowrap;">Testujący wyższy tier</span>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.7; margin-bottom:12px;">
+        Plan miesięczny 249 zł dostępny od Wrz 2025 przyciągnął <strong style="color:var(--text);">161 klientów</strong>, ale M+1 wynosi zaledwie <strong style="color:var(--text);">53,4%</strong> — o 14 pp. gorzej niż plan 199 zł i o 24 pp. gorzej niż plan 169 zł. Dane są wstępne (max 6 mies.), lecz sygnał jest wyraźny: <strong style="color:var(--text);">klient wchodzi z większymi oczekiwaniami i odpada szybciej.</strong>
+      </div>
+      <div style="background:var(--surface2); border-radius:8px; padding:10px 12px; font-size:11px; color:var(--muted);">
+        <span style="color:var(--red); font-weight:500;">Implikacja:</span> Plan mies. 249 zł wymaga dedykowanego onboardingu zanim stanie się skalowalnym produktem.
+      </div>
+    </div>
+
+    <div style="background:var(--surface); border:1px solid rgba(0,95,163,0.28); border-radius:12px; padding:20px 22px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <div style="width:32px; height:32px; background:var(--blue-dim); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">◎</div>
+        <div style="font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--blue);">Wrzesień to naturalny peak</div>
+      </div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.7; margin-bottom:12px;">
+        Wrzesień 2024 (+81 nowych) i Wrzesień 2025 (+53 nowych) to bezwzględnie najsilniejsze miesiące akwizycji. Wzorzec powtarza się niezależnie od poziomu cen. Mechanizm "nowy sezon, nowe zobowiązania" działa w tej niszy — prawdopodobnie koreluje z początkiem roku akademickiego/biznesowego.
+      </div>
+      <div style="background:var(--surface2); border-radius:8px; padding:10px 12px; font-size:11px; color:var(--muted);">
+        <span style="color:var(--blue); font-weight:500;">Implikacja:</span> Q3 to okno na największą kampanię roku.
+      </div>
+    </div>
+
+    <div style="background:var(--surface); border:1px solid rgba(196,149,0,0.25); border-radius:12px; padding:20px 22px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <div style="width:32px; height:32px; background:var(--yellow-dim); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">◇</div>
+        <div style="font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--yellow);">Podwyżki są akceptowalne</div>
+      </div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.7; margin-bottom:12px;">
+        Podwyżki ceny katalogowej <strong style="color:var(--text);">nie dotykają istniejących klientów</strong> — mechanizm lock-in chroni ich cenę bez wyjątków (93,4% klientów ma jedną, stałą cenę). Nikt z klientów na starej cenie nie zrezygnował i nie wrócił po nowej. <strong style="color:var(--text);">28 klientów (2,6%) dobrowolnie przeszło na droższy plan</strong>, najczęściej po kilkumiesięcznej przerwie.
+      </div>
+      <div style="background:var(--surface2); border-radius:8px; padding:10px 12px; font-size:11px; color:var(--muted);">
+        <span style="color:var(--yellow); font-weight:500;">Implikacja:</span> Nie masz problemu z podwyżkami — masz problem z M+1 churn. To jest priorytet nr 1.
+      </div>
+    </div>
+
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 22px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+        <div style="width:32px; height:32px; background:var(--surface2); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0;">◌</div>
+        <div style="font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--muted);">Plany roczne — niedoceniane</div>
+      </div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.7; margin-bottom:12px;">
+        394 transakcji to plany roczne (990–1799 zł). Klienci roczni mają medianę lifetime <strong style="color:var(--text);">20 miesięcy</strong> — znacznie powyżej średniej. Są to de facto najbardziej lojalni klienci w bazie, wymagający jednak osobnej analizy cohortowej (mała próba N=4 w śledzonych danych).
+      </div>
+      <div style="background:var(--surface2); border-radius:8px; padding:10px 12px; font-size:11px; color:var(--muted);">
+        <span style="color:var(--muted); font-weight:500;">Implikacja:</span> Rozważ aktywną sprzedaż planów rocznych jako upgrade.
+      </div>
+    </div>
+  </div>
+
+  <!-- RECOMMENDATIONS -->
+  <div class="section-title">Rekomendacje strategiczne — priorytetyzacja</div>
+  <div style="display:grid; grid-template-columns: minmax(0,2fr) minmax(0,1fr); gap:16px;">
+
+    <div style="display:flex; flex-direction:column; gap:10px;">
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 22px; display:grid; grid-template-columns: auto 1fr; gap:16px; align-items:start; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+        <div style="background:var(--yellow); color:#FFFFFF; font-family:'Syne',sans-serif; font-weight:800; font-size:13px; width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">#1</div>
+        <div>
+          <div style="font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--text); margin-bottom:6px;">Zaplanuj kampanię promo na sierpień–wrzesień 2026</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.65;">Wzorzec wrz-2024 i wrz-2025 jest powtarzalny. Promo jako onboarding (ograniczona czasowo zniżka: 30–50%) + content marketing w lipcu–sierpniu to przepis na rekordową akwizycję. Budżet kampanii powinien uwzględniać fakt, że klienci promo mają LTV zbliżone do standardowych — koszt akwizycji zwraca się szybko.</div>
+        </div>
+      </div>
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 22px; display:grid; grid-template-columns: auto 1fr; gap:16px; align-items:start; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+        <div style="background:var(--teal); color:#FFFFFF; font-family:'Syne',sans-serif; font-weight:800; font-size:13px; width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">#2</div>
+        <div>
+          <div style="font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--text); margin-bottom:6px;">Uruchom aktywny upsell do planów rocznych</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.65;">Klienci roczni to najlojalniejsi użytkownicy (mediana lifetime 20 mies.). Każdy klient miesięczny aktywny powyżej 3 miesięcy powinien otrzymać ofertę konwersji na plan roczny z rabatem (~15–20%). Przy 228 aktywnych i nawet 15% conversion rate to ~34 nowych planów rocznych × 1490–1799 zł = <strong style="color:var(--green);">~52k zł jednorazowego przychodu</strong>.</div>
+        </div>
+      </div>
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 22px; display:grid; grid-template-columns: auto 1fr; gap:16px; align-items:start; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+        <div style="background:var(--red); color:white; font-family:'Syne',sans-serif; font-weight:800; font-size:13px; width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">#3</div>
+        <div>
+          <div style="font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--text); margin-bottom:6px;">Kolejna podwyżka (249 zł) — strategia komunikacji</div>
+          <div style="font-size:12px; color:var(--muted); line-height:1.65;">Plan miesięczny 249 zł jest de facto nową ceną standardową od Wrz 2025. Plany 199 zł i 169 zł zostały uruchomione jednocześnie we Wrz 2024. Istniejący klienci są chronieni lock-inem — nie tracisz ich przez podwyżkę. Kluczowe działanie dotyczy nowych: <strong style="color:var(--text);">(1)</strong> onboarding który pokazuje wartość w pierwszych 30 dniach, <strong style="color:var(--text);">(2)</strong> monitoring M+1 dla planu 249 zł przez Q2–Q3 2026, <strong style="color:var(--text);">(3)</strong> rozważ voluntary upgrade path dla lojalnych klientów na starszych planach.</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: metrics + risk -->
+    <div style="display:flex; flex-direction:column; gap:10px;">
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+        <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:14px;">Szacowany potencjał Q2–Q3 2026</div>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border);">
+            <span style="font-size:11px; color:var(--muted);">Prognoza przychodu (6 mies.)</span>
+            <span style="font-family:'DM Mono',monospace; font-size:14px; color:var(--yellow); font-weight:500;">~430k zł</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border);">
+            <span style="font-size:11px; color:var(--muted);">Potencjał upsell roczny (15%)</span>
+            <span style="font-family:'DM Mono',monospace; font-size:14px; color:var(--green); font-weight:500;">~52k zł</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid var(--border);">
+            <span style="font-size:11px; color:var(--muted);">Nowi klienci (kampania Wrz)</span>
+            <span style="font-family:'DM Mono',monospace; font-size:14px; color:var(--teal); font-weight:500;">60–80</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0;">
+            <span style="font-size:11px; color:var(--muted);">Utrata przez podwyżkę 249 zł</span>
+            <span style="font-family:'DM Mono',monospace; font-size:14px; color:var(--red); font-weight:500;">~55–60</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+        <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--muted); margin-bottom:14px;">Ryzyka i ograniczenia modelu</div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; gap:8px; font-size:11px; line-height:1.5;">
+            <span style="color:var(--red); flex-shrink:0; margin-top:1px;">▲</span>
+            <span style="color:var(--muted);">Model predykcyjny ma <strong style="color:var(--text);">R²=0.11</strong> — sezonowość dominuje nad trendem. Przedziały ufności są szerokie (±20k zł).</span>
+          </div>
+          <div style="display:flex; gap:8px; font-size:11px; line-height:1.5;">
+            <span style="color:var(--yellow); flex-shrink:0; margin-top:1px;">▲</span>
+            <span style="color:var(--muted);">Segment promo (N=48) jest zbyt mały do statystycznie pewnych wniosków. Potrzebna większa próba z kontrolowanym testem A/B.</span>
+          </div>
+          <div style="display:flex; gap:8px; font-size:11px; line-height:1.5;">
+            <span style="color:var(--yellow); flex-shrink:0; margin-top:1px;">▲</span>
+            <span style="color:var(--muted);">Brak danych o powodach odejść (cancel surveys) — churn model jest symptomatyczny, nie przyczynowy.</span>
+          </div>
+          <div style="display:flex; gap:8px; font-size:11px; line-height:1.5;">
+            <span style="color:var(--muted); flex-shrink:0; margin-top:1px;">◌</span>
+            <span style="color:var(--muted);">Korekta: plany roczne wymagają osobnej analizy cohortowej — obecna próba N=4 jest niereprezentacyjna.</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:var(--yellow-dim); border:1px solid rgba(196,149,0,0.25); border-radius:12px; padding:16px 18px;">
+        <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:var(--yellow); margin-bottom:10px;">Najważniejszy wniosek</div>
+        <div style="font-size:12px; color:var(--text); line-height:1.7;">KDS ma zdrową bazę lojalnych klientów, powtarzalny pattern sezonowy i udowodnioną zdolność do absorbowania podwyżek. Główne wyzwanie to <strong>wysoki churn w M+1</strong> — każdy drugi nowy klient nie wraca w kolejnym miesiącu. Rozwiązanie tego jednego problemu ma potencjał podwojenia LTV całej bazy.</div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+</div>
+
+<div class="page-view" id="page2" style="display:none;">
+<div class="page" style="padding-top:28px;">
+
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:28px;">
+    <div>
+      <div style="font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--text); margin-bottom:4px;">Metodologia &amp; Terminologia</div>
+      <div style="font-size:12px; color:var(--muted);">Opis podejścia analitycznego · definicje pojęć · ograniczenia modeli</div>
+    </div>
+    <div style="background:var(--blue-dim); border:1px solid rgba(0,95,163,0.25); border-radius:8px; padding:8px 16px; font-size:11px; font-weight:500; color:var(--blue); text-transform:uppercase; letter-spacing:0.08em;">Dokumentacja</div>
+  </div>
+
+  <div class="section-title">Źródło i zakres danych</div>
+  <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:24px;">
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin-bottom:10px;">Dane wejściowe</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.7;">Plik <strong style="color:var(--text);">KDS_Transactions.xlsx</strong> — 4 227 transakcji, 1 057 unikalnych klientów, listopad 2023 – marzec 2026. Każdy wiersz to jedna płatność: data, ID klienta, kwota.</div>
+    </div>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin-bottom:10px;">Zakres czasowy</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.7;">28 miesięcy historii. Dane są kompletne — brak luk w eksporcie. Ostatni miesiąc (marzec 2026).</div>
+    </div>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin-bottom:10px;">Narzędzia</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.7;">Python (pandas, numpy, scipy) do analizy i obliczeń. Chart.js do wizualizacji. Predykcja oparta o regresję liniową na ostatnich 12 miesiącach danych.</div>
+    </div>
+  </div>
+
+  <div class="section-title">Segmentacja klientów</div>
+  <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:24px;">
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--text); margin-bottom:12px;">Typy płatności</div>
+      <div style="display:flex; flex-direction:column; gap:8px; font-size:12px;">
+        <div style="display:grid; grid-template-columns:auto 1fr; gap:10px; padding:8px 0; border-bottom:1px solid var(--border);">
+          <span style="font-family:'DM Mono',monospace; color:var(--teal); font-size:11px; white-space:nowrap;">Cena bazowa</span>
+          <span style="color:var(--muted);">Płatność w kwocie dokładnie odpowiadającej cenie katalogowej.</span>
+        </div>
+        <div style="display:grid; grid-template-columns:auto 1fr; gap:10px; padding:8px 0; border-bottom:1px solid var(--border);">
+          <span style="font-family:'DM Mono',monospace; color:var(--yellow); font-size:11px; white-space:nowrap;">Kod zniżkowy</span>
+          <span style="color:var(--muted);">Kwota niższa niż cena bazowa o więcej niż 3%. Wskazuje na zastosowanie kodu zniżkowego przy aktywacji. Zniżki w danych wahają się od 5% do 44%.</span>
+        </div>
+        <div style="display:grid; grid-template-columns:auto 1fr; gap:10px; padding:8px 0; border-bottom:1px solid var(--border);">
+          <span style="font-family:'DM Mono',monospace; color:var(--blue); font-size:11px; white-space:nowrap;">Płatność z góry</span>
+          <span style="color:var(--muted);">Kwota powyżej 400 zł. Interpretowana jako wielomiesięczna opłata z góry (6 lub 12 mies.) na podstawie dopasowania do wielokrotności cen bazowych (tolerancja ±10%).</span>
+        </div>
+        <div style="display:grid; grid-template-columns:auto 1fr; gap:10px; padding:8px 0;">
+          <span style="font-family:'DM Mono',monospace; color:var(--red); font-size:11px; white-space:nowrap;">Double catch-up</span>
+          <span style="color:var(--muted);">Kwota równa 2× cenie bazowej klienta. Oznacza powrót po jednym miesiącu przerwy z wyrównaniem poprzedniego okresu (N=1 potwierdzony przypadek).</span>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:18px 20px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="font-family:'Syne',sans-serif; font-size:13px; font-weight:600; color:var(--text); margin-bottom:12px;">Mechanizm lock-in ceny</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.7; margin-bottom:12px;">
+        KDS zachowuje cenę z momentu aktywacji subskrypcji. <strong style="color:var(--text);">93,4% klientów</strong> ma jedną, niezmienną kwotę przez całe życie subskrypcji. Podwyżki ceny katalogowej dotyczą wyłącznie nowych klientów.
+      </div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.7;">
+        <strong style="color:var(--text);">Free months:</strong> przerwa w transakcjach po której klient wraca w tej samej cenie (nie podwójnej). Interpretowane jako miesiące gratis przyznane przez właściciela firmy. Zidentyfikowano <strong style="color:var(--text);">60 klientów</strong> z łącznie <strong style="color:var(--text);">198 darmowymi subskrypcjami</strong>.
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Definicje kluczowych wskaźników</div>
+  <div style="display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-bottom:24px;">
+
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="font-family:'DM Mono',monospace; font-size:12px; color:var(--teal); font-weight:500; margin-bottom:6px;">Retencja M+1</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.65;">Odsetek klientów z danej kohorty (M0), którzy dokonali kolejnej transakcji w miesiącu M+1. <strong style="color:var(--text);">Nie uwzględnia</strong> klientów na planach wielomiesięcznych (brak transakcji = nie odejście).</div>
+    </div>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="font-family:'DM Mono',monospace; font-size:12px; color:var(--teal); font-weight:500; margin-bottom:6px;">Lifetime</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.65;">Liczba miesięcy od pierwszej do ostatniej <em>zaobserwowanej</em> transakcji. Wartość 0 = klient zapłacił raz i nie wrócił. <strong style="color:var(--text);">Uwaga — right-censoring:</strong> klienci aktywni w marcu 2026 mają obcięty pomiar (np. klient z Jan 2026 pokazuje lifetime=2, choć subskrypcja trwa). Mediana lifetime nie jest używana w raporcie — zastąpiona retencją M+N jako bardziej wiarygodną miarą.</div>
+    </div>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="font-family:'DM Mono',monospace; font-size:12px; color:var(--teal); font-weight:500; margin-bottom:6px;">LTV (avg)</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.65;">Suma wszystkich transakcji klienta (łącznie z płatnościami z góry). Średnia arytmetyczna kohorty. Wartości zawyżone są przez pojedynczych klientów z wieloma latami subskrypcji.</div>
+    </div>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="font-family:'DM Mono',monospace; font-size:12px; color:var(--yellow); font-weight:500; margin-bottom:6px;">Nowy klient</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.65;">Klient, którego pierwsza transakcja w historii bazy przypada na dany miesiąc. Rezygnacja i powrót tego samego klienta <strong style="color:var(--text);">nie jest</strong> traktowana jako nowy klient.</div>
+    </div>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="font-family:'DM Mono',monospace; font-size:12px; color:var(--yellow); font-weight:500; margin-bottom:6px;">Aktywny klient</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.65;">Klient, który ma aktywną subskrypcję w danym miesiącu. Klienci na planach wielomiesięcznych są aktywni przez cały opłacony okres — np. klient który zapłacił 1 490 zł w październiku za 6 miesięcy jest aktywny od października do marca włącznie. <strong style="color:var(--text);">Ograniczenie:</strong> dane zawierają tylko transakcje, nie bezpośredni status subskrypcji — aktywność wielomiesięczna jest szacowana na podstawie kwoty i liczby opłaconych miesięcy.</div>
+    </div>
+    <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+      <div style="font-family:'DM Mono',monospace; font-size:12px; color:var(--yellow); font-weight:500; margin-bottom:6px;">Locked price</div>
+      <div style="font-size:12px; color:var(--muted); line-height:1.65;">Cena zablokowana przy aktywacji subskrypcji. Klient płaci tę samą kwotę co miesiąc niezależnie od zmian ceny katalogowej, chyba że sam wykona upgrade.</div>
+    </div>
+
+  </div>
+
+  <div class="section-title">Ograniczenia analizy</div>
+  <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px 24px; margin-bottom:24px; box-shadow:0 1px 4px rgba(0,0,0,0.06);">
+    <div style="display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; font-size:12px; color:var(--muted); line-height:1.7;">
+      <div>
+        <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin-bottom:8px;">Model predykcyjny</div>
+        <div>Regresja liniowa na 12 miesiącach ma <strong style="color:var(--text);">R²=0.11</strong> — sezonowość dominuje nad trendem. Przedziały ufności ±18–24k zł/mies. są szerokie. Prognoza powinna być traktowana jako orientacyjna, nie jako plan finansowy.</div>
+      </div>
+      <div>
+        <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin-bottom:8px;">Plany wielomiesięczne</div>
+        <div>Klienci na planach 6- i 12-miesięcznych są wykluczeni z analizy retencji M+1 — brak transakcji w kolejnym miesiącu nie oznacza churnu. Ich retention i LTV wymagają osobnej metodologii.</div>
+      </div>
+      <div>
+        <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin-bottom:8px;">Plan mies. 249 zł</div>
+        <div>Aktywny od Wrz 2025 — maksymalnie 6 miesięcy danych w momencie analizy. Wskaźniki retencji i LTV są wstępne i wymagają weryfikacji po Q3 2026.</div>
+      </div>
+      <div>
+        <div style="font-family:'Syne',sans-serif; font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:0.08em; color:var(--muted); margin-bottom:8px;">Brak danych jakościowych</div>
+        <div>Analiza opiera się wyłącznie na danych transakcyjnych. Brak informacji o powodach rezygnacji, źródłach akwizycji (kanał), zachowaniu w produkcie ani demografii klientów.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-note">Dane: 4 227 transakcji · 1 057 klientów · Analiza: segmentacja cenowa, cohort retention, regresja liniowa · Model predykcyjny: R²=0.11</div>
+  <div class="footer-brand">KajoDataSpace · BI Report 2026</div>
+</div>
+
+<script>
+function getChartColors() {
+  const light = document.documentElement.getAttribute('data-theme') === 'light';
+  return {
+    grid:       light ? 'rgba(0,0,0,0.07)'       : 'rgba(255,255,255,0.04)',
+    tick:       light ? '#5A6478'                : '#7A8499',
+    tickDark:   light ? '#18202E'                : '#EDF0F5',
+    yellow:     light ? '#9A6F00'                : '#F5C842',
+    yellowMid:  light ? 'rgba(154,111,0,0.6)'    : 'rgba(245,200,66,0.6)',
+    yellowCI:   light ? 'rgba(154,111,0,0.25)'   : 'rgba(245,200,66,0.2)',
+    teal:       light ? '#0A7FAF'                : '#56B4E9',
+    tealBg:     light ? 'rgba(10,127,175,0.06)'  : 'rgba(86,180,233,0.05)',
+    blue:       light ? '#005694'                : '#0072B2',
+    hikeYellow: light ? '#9A6F00'                : '#F5C842',
+    hikeRed:    light ? '#B83A00'                : '#D55E00',
+    revBars:    (rev) => rev.map((_,i)=> light
+      ? (i<2?'rgba(154,111,0,0.35)':i<10?'rgba(154,111,0,0.5)':i<22?'rgba(154,111,0,0.72)':'rgba(154,111,0,0.9)')
+      : (i<2?'rgba(245,200,66,0.4)':i<10?'rgba(245,200,66,0.55)':i<22?'rgba(245,200,66,0.75)':'rgba(245,200,66,0.9)')
+    ),
+    ncTeal:     light ? 'rgba(10,127,175,0.85)'  : 'rgba(86,180,233,0.85)',
+    ncYellow:   light ? 'rgba(154,111,0,0.90)'   : 'rgba(245,200,66,0.9)',
+    churnBase:  light ? 'rgba(184,58,0,'         : 'rgba(213,94,0,',
+  };
+}
+
+function applyChartTheme() {
+  const cc = getChartColors();
+  const REV_DATA = window._revData;
+  if (window._revChart) {
+    const c = window._revChart;
+    c.data.datasets[0].backgroundColor = cc.revBars(REV_DATA);
+    c.data.datasets[1].borderColor = cc.teal;
+    c.data.datasets[1].backgroundColor = cc.tealBg;
+    c.data.datasets[1].pointBackgroundColor = cc.teal;
+    c.options.scales.x.ticks.color = cc.tick;
+    c.options.scales.x.grid.color = cc.grid;
+    c.options.scales.y.ticks.color = cc.tick;
+    c.options.scales.y.grid.color = cc.grid;
+    c.options.scales.y2.ticks.color = cc.teal;
+    // update hike plugin colors
+    c._hikeColors = { yellow: cc.hikeYellow, red: cc.hikeRed };
+    c.update();
+  }
+  if (window._ncChart) {
+    const c = window._ncChart;
+    c.data.datasets[0].backgroundColor = cc.ncTeal;
+    c.data.datasets[1].backgroundColor = cc.ncYellow;
+    c.options.scales.x.ticks.color = cc.tick;
+    c.options.scales.y.ticks.color = cc.tick;
+    c.options.scales.y.grid.color = cc.grid;
+    c.update();
+  }
+  if (window._retChart) {
+    const c = window._retChart;
+    c.data.datasets[0].borderColor = cc.teal;
+    c.data.datasets[0].pointBackgroundColor = cc.teal;
+    c.data.datasets[1].borderColor = cc.blue;
+    c.data.datasets[1].pointBackgroundColor = cc.blue;
+    c.data.datasets[2].borderColor = cc.yellow;
+    c.data.datasets[2].pointBackgroundColor = cc.yellow;
+    c.options.scales.x.title.color = cc.tick;
+    c.options.scales.x.ticks.color = cc.tick;
+    c.options.scales.x.grid.color = cc.grid;
+    c.options.scales.y.ticks.color = cc.tick;
+    c.options.scales.y.grid.color = cc.grid;
+    c.update();
+  }
+  if (window._forecastChart) {
+    const c = window._forecastChart;
+    c.data.datasets[0].borderColor = cc.yellow;
+    c.data.datasets[0].pointBackgroundColor = cc.yellow;
+    c.data.datasets[1].borderColor = cc.yellowMid;
+    c.data.datasets[1].pointBackgroundColor = cc.yellowMid;
+    c.data.datasets[2].borderColor = cc.yellowCI;
+    c.data.datasets[3].borderColor = cc.yellowCI;
+    c.options.scales.x.ticks.color = cc.tick;
+    c.options.scales.x.grid.color = cc.grid;
+    c.options.scales.y.ticks.color = cc.tick;
+    c.options.scales.y.grid.color = cc.grid;
+    c.update();
+  }
+  if (window._churnChart) {
+    const c = window._churnChart;
+    const b = cc.churnBase;
+    c.data.datasets[0].backgroundColor = b+'0.5)';
+    c.data.datasets[1].backgroundColor = b+'0.7)';
+    c.data.datasets[2].backgroundColor = b+'0.9)';
+    c.options.plugins.legend.labels.color = cc.tick;
+    c.options.scales.x.ticks.color = cc.tickDark;
+    c.options.scales.y.ticks.color = cc.tick;
+    c.options.scales.y.grid.color = cc.grid;
+    c.update();
+  }
+}
+
+function toggleTheme() {
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+  const next = isLight ? null : 'light';
+  if (next) document.documentElement.setAttribute('data-theme', 'light');
+  else document.documentElement.removeAttribute('data-theme');
+  document.getElementById('themeIcon').textContent  = isLight ? '☀️' : '🌙';
+  document.getElementById('themeLabel').textContent = isLight ? 'Light' : 'Dark';
+  localStorage.setItem('kds-theme', next || 'dark');
+  applyChartTheme();
+}
+
+(function(){
+  const saved = localStorage.getItem('kds-theme');
+  if (saved === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('themeIcon').textContent  = '🌙';
+      document.getElementById('themeLabel').textContent = 'Dark';
+    });
+  }
+})();
+
+function showPage(idx) {
+  const pages = document.querySelectorAll('.page-view');
+  const btns  = document.querySelectorAll('.nav-btn');
+  const label = document.getElementById('navPageLabel');
+  pages.forEach((p, i) => p.style.display = i === idx ? '' : 'none');
+  btns.forEach((b, i) => b.classList.toggle('active', i === idx));
+  label.textContent = 'Strona ' + (idx+1) + ' z 3';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+window.addEventListener("load", function() {
+const C = Chart;
+const MONTHS_ALL = ['Lis\'23','Gru','Sty\'24','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru','Sty\'25','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru','Sty\'26','Lut','Mar'];
+const REV = [26526,6757,12625,6275,8891,12346,27456,13033,7483,5406,43551,23592,41119,38895,43923,25805,48297,32126,47287,54065,38073,37801,77735,56410,68952,49929,63607,53167,79971];
+window._revData = REV;
+const ACTIVE = [83,47,64,57,58,60,115,79,71,59,152,138,172,152,164,138,173,149,178,194,171,164,225,213,239,215,230,205,228];
+
+const hikePlugin = {
+  id:'hikes',
+  afterDraw(chart){
+    const {ctx,scales:{x,y}} = chart;
+    [
+      {idx:10, lbl:'↑ cennik 2024: 199 zł / promo 169', c:(chart._hikeColors||{yellow:'#F5C842'}).yellow},
+      {idx:22, lbl:'↑ cennik 2025: 249 zł / promo 199', c:(chart._hikeColors||{red:'#D55E00'}).red}
+    ].forEach(h=>{
+      const px = x.getPixelForValue(h.idx);
+      if(!px || px < x.left || px > x.right) return;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(x.left, y.top, x.right - x.left, y.bottom - y.top);
+      ctx.clip();
+      ctx.strokeStyle = h.c + 'aa';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4,3]);
+      ctx.beginPath(); ctx.moveTo(px, y.top + 16); ctx.lineTo(px, y.bottom); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.restore();
+      ctx.save();
+      ctx.fillStyle = h.c;
+      ctx.font = '500 9px DM Sans, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(h.lbl, px, y.top + 10);
+      ctx.restore();
+    });
+  }
+};
+
+window._revChart = new C(document.getElementById('revChart'),{
+  type:'bar',
+  plugins:[hikePlugin],
+  data:{
+    labels: MONTHS_ALL,
+    datasets:[
+      {type:'bar', label:'Przychód', data:REV, backgroundColor: REV.map((_,i)=>i<2?'rgba(245,200,66,0.4)':i<10?'rgba(245,200,66,0.55)':i<22?'rgba(245,200,66,0.75)':'rgba(245,200,66,0.9)'), borderRadius:2, yAxisID:'y'},
+      {type:'line', label:'Aktywni klienci', data:ACTIVE, borderColor:'#56B4E9', backgroundColor:'rgba(86,180,233,0.05)', tension:0.4, pointRadius:2, pointBackgroundColor:'#56B4E9', borderWidth:2, yAxisID:'y2', fill:false}
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}, tooltip:{callbacks:{label:ctx=>ctx.datasetIndex===0?' '+ctx.raw.toLocaleString('pl-PL')+' zł':' '+ctx.raw+' klientów'}}},
+    scales:{
+      x:{ticks:{font:{size:9},color:'#7A8499',maxRotation:45,autoSkip:true,maxTicksLimit:15},grid:{color:'rgba(255,255,255,0.04)'}},
+      y:{position:'left', ticks:{font:{size:9},color:'#7A8499',callback:v=>Math.round(v/1000)+'k'},grid:{color:'rgba(255,255,255,0.04)'}},
+      y2:{position:'right', ticks:{font:{size:9},color:'#56B4E9'},grid:{display:false}}
+    }
+  }
+});
+
+const NC_LABELS = ['Lis\'23','Gru','Sty\'24','Lut','Mar','Kwi','Maj','Cze','Wrz','Paź','Lis','Gru','Sty\'25','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz','Paź','Lis','Gru','Sty\'26','Lut','Mar'];
+window._ncChart = new C(document.getElementById('ncChart'),{
+  type:'bar',
+  data:{
+    labels:NC_LABELS,
+    datasets:[
+      {label:'Cena bazowa', data:[62,6,25,11,8,16,46,6,90,19,25,22,43,19,41,16,38,58,31,32,67,32,44,30,43,31,37], backgroundColor:'rgba(86,180,233,0.85)', stack:'a'},
+      {label:'Kod zniżkowy',   data:[21,2,2,2,2,0,15,0,6,2,8,7,1,2,5,4,5,2,1,3,14,12,7,4,6,2,24], backgroundColor:'rgba(245,200,66,0.9)', stack:'a'},
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{
+      x:{stacked:true, ticks:{font:{size:9},color:'#7A8499',maxRotation:45,autoSkip:false,maxTicksLimit:20},grid:{display:false}},
+      y:{stacked:true, ticks:{font:{size:9},color:'#7A8499'},grid:{color:'rgba(255,255,255,0.04)'}}
+    }
+  }
+});
+
+window._retChart = new C(document.getElementById('retChart'),{
+  type:'line',
+  data:{
+    labels:['M0','M1','M2','M3','M4','M5','M6','M7','M8','M9','M10','M11','M12'],
+    datasets:[
+      {label:'Plan mies. 169 zł, cennik 2024 (N=100)',data:[100,82.0,71.0,61.0,55.0,46.0,42.0,36.0,30.0,26.0,21.0,17.0,20.0],borderColor:'#0E8EC4',tension:0.35,pointRadius:3,pointBackgroundColor:'#0E8EC4',borderWidth:2.5,fill:false},
+      {label:'Plan mies. 199 zł, cennik 2024 (N=201)',data:[100,68.4,55.6,40.7,31.3,22.9,20.4,13.8,11.3,9.1,8.0,6.5,5.1],borderColor:'#005FA3',tension:0.35,pointRadius:2,pointBackgroundColor:'#005FA3',borderWidth:2,borderDash:[6,3],fill:false},
+      {label:'Kod zniżkowy (N=160)',data:[100,60.0,51.9,40.0,36.2,31.9,23.8,21.2,18.1,15.0,15.0,11.9,10.6],borderColor:'#C49500',tension:0.35,pointRadius:2,pointBackgroundColor:'#C49500',borderWidth:2,borderDash:[3,3],fill:false}
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:ctx=>' '+ctx.raw.toFixed(1)+'%'}}},
+    scales:{
+      x:{title:{display:true,text:'Miesiąc od pierwszego zakupu',font:{size:10},color:'#7A8499'},ticks:{font:{size:9},color:'#7A8499'},grid:{color:'rgba(255,255,255,0.04)'}},
+      y:{min:0,max:100,ticks:{font:{size:9},color:'#7A8499',callback:v=>v+'%'},grid:{color:'rgba(255,255,255,0.04)'}}
+    }
+  }
+});
+
+// FORECAST CHART
+window._forecastChart = new C(document.getElementById('forecastChart'),{
+  type:'line',
+  data:{
+    labels:['Paź\'25','Lis','Gru','Sty\'26','Lut','Mar','Kwi','Maj','Cze','Lip','Sie','Wrz'],
+    datasets:[
+      {
+        label:'Historyczny',
+        data:[56410,68952,49929,63607,53167,79971,null,null,null,null,null,null],
+        borderColor:'#F5C842', borderWidth:2.5,
+        pointRadius:[3,3,3,3,3,5,0,0,0,0,0,0],
+        pointBackgroundColor:'#F5C842',
+        tension:0.4, fill:false, spanGaps:false
+      },
+      {
+        label:'Prognoza',
+        data:[null,null,null,null,null,79971,67269,69013,70757,72500,74244,75987],
+        borderColor:'rgba(245,200,66,0.6)', borderWidth:2, borderDash:[7,4],
+        pointRadius:[0,0,0,0,0,0,3,3,3,3,3,3],
+        pointBackgroundColor:'rgba(245,200,66,0.6)',
+        tension:0.4, fill:false, spanGaps:false
+      },
+      {
+        label:'CI górna',
+        data:[null,null,null,null,null,null,85669,88213,90857,93800,96744,99787],
+        borderColor:'rgba(245,200,66,0.2)', borderWidth:1, borderDash:[2,4],
+        pointRadius:0, fill:false, tension:0.3, spanGaps:false
+      },
+      {
+        label:'CI dolna',
+        data:[null,null,null,null,null,null,48869,49813,50657,51200,51744,52187],
+        borderColor:'rgba(245,200,66,0.2)', borderWidth:1, borderDash:[2,4],
+        pointRadius:0, fill:false, tension:0.3, spanGaps:false
+      }
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      tooltip:{
+        callbacks:{
+          label:ctx=>{
+            if(ctx.raw===null) return '';
+            const v=Math.round(ctx.raw).toLocaleString('pl-PL')+' zł';
+            return ctx.dataset.label.startsWith('CI') ? ' CI: '+v : ' '+v;
+          }
+        }
+      }
+    },
+    layout:{ padding:{ top:4, right:16, bottom:0, left:0 } },
+    scales:{
+      x:{ticks:{font:{size:9},color:'#7A8499'},grid:{color:'rgba(255,255,255,0.04)'}},
+      y:{min:30000,ticks:{font:{size:9},color:'#7A8499',callback:v=>Math.round(v/1000)+'k zł'},grid:{color:'rgba(255,255,255,0.04)'}}
+    }
+  }
+});
+
+// CHURN RISK CHART
+window._churnChart = new C(document.getElementById('churnChart'),{
+  type:'bar',
+  data:{
+    labels:['Plan mies. 169 zł','Plan mies. 199 zł','Plan mies. 249 zł'],
+    datasets:[
+      {label:'30 dni',data:[22.2,32.8,46.6],backgroundColor:'rgba(213,94,0,0.5)',borderRadius:4},
+      {label:'60 dni',data:[31.0,46.1,68.3],backgroundColor:'rgba(213,94,0,0.7)',borderRadius:4},
+      {label:'90 dni',data:[42.4,60.8,77.6],backgroundColor:'rgba(213,94,0,0.9)',borderRadius:4},
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{display:true,position:'top',labels:{font:{size:10},color:'#7A8499',boxWidth:10,boxHeight:10,padding:12}},
+      tooltip:{callbacks:{label:ctx=>' ryzyko odejścia: '+ctx.raw+'%'}}
+    },
+    layout:{ padding:{ top:0, right:8, bottom:0, left:0 } },
+    scales:{
+      x:{ticks:{font:{size:11},color:'#EDF0F5'},grid:{display:false}},
+      y:{min:0,max:100,ticks:{font:{size:9},color:'#7A8499',callback:v=>v+'%'},grid:{color:'rgba(255,255,255,0.04)'}}
+    }
+  }
+});
+
+  if (localStorage.getItem('kds-theme') === 'light') applyChartTheme();
+}); // end load
+</script>
+</body>
+</html>
